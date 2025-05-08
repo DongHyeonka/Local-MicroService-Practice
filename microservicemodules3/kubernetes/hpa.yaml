@@ -1,0 +1,45 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: microservice-2-hpa
+  namespace: microservice-2
+  labels:
+    app: microservice-2
+    tier: backend
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: microservice-2
+  minReplicas: 1  # 백엔드 서비스는 1개로도 초기 운영 가능
+  maxReplicas: 3  # 로컬 환경에서는 3개면 충분함
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75  # CPU 사용률 75%에서 스케일링
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80  # 메모리 사용률 80%에서 스케일링
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 120  # 2분 안정화 시간
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 90  # 90초마다 최대 1개 파드 증가
+      - type: Percent
+        value: 50
+        periodSeconds: 90  # 또는 현재 파드 수의 50%까지 증가
+      selectPolicy: Max  # 위 두 정책 중 더 많은 파드를 증가시키는 정책 선택
+    scaleDown:
+      stabilizationWindowSeconds: 300  # 5분 안정화 시간
+      policies:
+      - type: Percent
+        value: 20
+        periodSeconds: 180  # 3분마다 최대 20%까지 감소 

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice-2-service
+  namespace: microservice-2
+  labels:
+    app: microservice-2
+    tier: backend
+spec:
+  type: ClusterIP  # 클러스터 내부에서만 접근 가능 (API Gateway에서만 접근)
+  ports:
+  - port: 5002  # 서비스 포트 (API Gateway에서 이 포트로 접근)
+    targetPort: 5002  # 컨테이너 포트
+    protocol: TCP
+    name: http
+  - port: 6000
+    targetPort: 6000
+    protocol: TCP
+    name: metrics
+  selector:
+    app: microservice-2  # Deployment의 파드 레이블과 일치 
