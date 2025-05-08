@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice-1-service
+  namespace: microservice-1
+  labels:
+    app: microservice-1
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5001  # 서비스 포트 (API Gateway에서 이 포트로 접근)
+    targetPort: 5001  # 컨테이너 포트
+    protocol: TCP
+    name: http
+  - port: 6000
+    targetPort: 6000
+    protocol: TCP
+    name: metrics
+  selector:
+    app: microservice-1  # Deployment의 파드 레이블과 일치 

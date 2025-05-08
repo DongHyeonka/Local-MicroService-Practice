@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-1
+  namespace: microservice-1
+  labels:
+    app: microservice-1
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice-1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: microservice-1
+        tier: backend
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '6000'
+        prometheus.io/path: '/actuator/prometheus'
+    spec:
+      serviceAccountName: microservice-1-sa
+      containers:
+      - name: microservice-1
+        image: microservice-1:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5001
+          name: http
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgres-service-ms1.microservice-1.svc.cluster.local:5432/microservice-1-db"
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret-ms1
+              key: POSTGRES_USER
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret-ms1
+              key: POSTGRES_PASSWORD
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 6000
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 6000
+          initialDelaySeconds: 40
+          periodSeconds: 20
+          timeoutSeconds: 2 
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /app/logs
+      volumes:
+      - name: logs-volume
+        persistentVolumeClaim:
+          claimName: microservice-1-logs-pvc

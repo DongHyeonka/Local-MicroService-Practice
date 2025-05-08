@@ -16,4 +16,4 @@
 ---
 ## 프로젝트 구조 작성
 
-![현재 아키텍처 다이어그램](./images/current-architecture-picture.png "시스템 현재 아키텍처")
+![현재 아키텍처 다이어그램](./images/current-architecture-picture-2.png "시스템 현재 아키텍처")
