@@ -29,8 +29,17 @@ RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/kubernete
 # =========================================
 FROM eclipse-temurin:21-jre-alpine
 
+# --- Pinpoint Agent 추가 시작 ---
+
 # 필요한 유틸리티 설치 (tar)
 RUN apk add --no-cache tar
+
+# Pinpoint Agent 파일 복사 및 압축 해제
+COPY pinpoint-agent-*.tar.gz /tmp/pinpoint-agent.tar.gz
+RUN mkdir -p /app/pinpoint-agent && \
+    tar -xzf /tmp/pinpoint-agent.tar.gz -C /app/pinpoint-agent --strip-components=1 && \
+    rm /tmp/pinpoint-agent.tar.gz
+# --- Pinpoint Agent 추가 끝 ---
 
 # 보안을 위한 비루트 사용자 설정
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -50,6 +59,11 @@ ARG DEPENDENCY=/app/build/dependency
 COPY --from=builder ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=builder ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=builder ${DEPENDENCY}/BOOT-INF/classes /app
+
+# --- Pinpoint Agent 권한 설정 ---
+# Agent 디렉토리 소유권 변경
+RUN chown -R appuser:appgroup /app/pinpoint-agent
+# --- Pinpoint Agent 권한 설정 끝 ---
 
 # 5000 포트 노출
 EXPOSE 5000

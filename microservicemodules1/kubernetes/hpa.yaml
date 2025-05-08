@@ -39,3 +39,4 @@ spec:
       - type: Percent
         value: 25
         periodSeconds: 120  # 2분마다 최대 25%까지 감소 
+        
