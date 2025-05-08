@@ -1,0 +1,38 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.springboot'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	//Spring JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	//PostgreSQL
+	implementation 'org.postgresql:postgresql'
+	//Spring Prometheus
+	implementation "io.micrometer:micrometer-registry-prometheus"
+	// Spring Boot Actuator
+	implementation "org.springframework.boot:spring-boot-starter-actuator"
+	//Spring Boot Web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	//Spring Boot Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

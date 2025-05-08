@@ -1,0 +1,71 @@
+server:
+    port: 5000
+    tomcat:
+      mbeanregistry:
+        enabled: true
+
+spring:
+    main:
+        web-application-type: reactive
+
+    application:
+        name: api-gateway
+    
+    cloud:
+        kubernetes:
+            enabled: true
+            discovery:
+                enabled: true
+                all-namespaces: true
+            config:
+                enabled: false
+            loadbalancer:
+                mode: service
+        gateway:
+          default-filters:
+            - RemoveRequestHeader=Cookie
+          routes:
+            - id: microservice-1-route
+              uri: lb://microservice-1-service
+              predicates:
+                - Path=/1/**
+              filters:
+                - RewritePath=/1/(?<segment>.*), /api/v1/1/${segment}
+
+            - id: microservice-2-route
+              uri: lb://microservice-2-service
+              predicates:
+                - Path=/2/**
+              filters:
+                - RewritePath=/2/(?<segment>.*), /api/v1/2/${segment}
+
+    autoconfigure:
+        exclude:
+        - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+management:
+    server:
+        port: 6000
+    endpoints:
+        web:
+          exposure:
+            include: health,info,prometheus,mappings
+    endpoint:
+        health:
+          show-details: always
+    prometheus:
+      metrics:
+        export:
+          enabled: true
+    metrics:
+      tags:
+        application: ${spring.application.name}
+    
+    logging:
+      level:
+        root: INFO
+        org.springframework.cloud.gateway: INFO
+        org.springframework.web.reactive: INFO
+        reactor.netty.http.server: INFO
+        reactor.netty.http.client: INFO
