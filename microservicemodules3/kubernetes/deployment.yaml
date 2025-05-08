@@ -47,6 +47,25 @@ spec:
             secretKeyRef:
               name: postgres-secret-ms2
               key: POSTGRES_PASSWORD
+        - name: PINPOINT_AGENT_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PINPOINT_APPLICATION_NAME
+          value: "microservice-2"
+        - name: PINPOINT_COLLECTOR_IP
+          value: "192.168.0.107"
+        - name: JAVA_TOOL_OPTIONS
+          value: >-
+            -javaagent:/app/pinpoint-agent/pinpoint-bootstrap.jar
+            -Dpinpoint.agentId=$(PINPOINT_AGENT_ID)
+            -Dpinpoint.applicationName=$(PINPOINT_APPLICATION_NAME)
+            -Dprofiler.transport.grpc.collector.ip=$(PINPOINT_COLLECTOR_IP)
+            -Dprofiler.transport.grpc.collector.port=9991
+            -Dpinpoint.profiler.sampling.counting.sampling-rate=1
+            -XX:+UseContainerSupport
+            -XX:MaxRAMPercentage=75.0
+            -Djava.security.egd=file:/dev/./urandom
         resources:
           requests:
             cpu: 500m

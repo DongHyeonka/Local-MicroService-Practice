@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: microservice-1-monitor
+  namespace: monitoring
+  labels:
+    app: microservice-1
+spec:
+  selector:
+    matchLabels:
+      app: microservice-1
+  namespaceSelector:
+    matchNames:
+      - microservice-1
+  endpoints:
+  - port: metrics
+    path: /actuator/prometheus
+    interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: microservice-2-monitor
+  namespace: monitoring
+  labels:
+    app: microservice-2
+spec:
+  selector:
+    matchLabels:
+      app: microservice-2
+  namespaceSelector:
+    matchNames:
+      - microservice-2
+  endpoints:
+  - port: metrics
+    path: /actuator/prometheus
+    interval: 15s
