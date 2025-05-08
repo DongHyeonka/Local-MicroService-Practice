@@ -16,9 +16,4 @@
 ---
 ## 프로젝트 구조 작성
 
-Local-MicroService-Practice/
-├── microservicemodules1/          # api-gateway-server
-├── microservicemodules2/          # 첫 번째 마이크로서비스
-└── microservicemodules3/          # 두 번째 마이크로서비스
-
 ![현재 아키텍처 다이어그램](./images/current-architecture-picture.png "시스템 현재 아키텍처")
